@@ -1,0 +1,22 @@
+{
+    "name": "kang-babi/models",
+    "require": {
+        "illuminate/routing": "^11.36",
+        "illuminate/collections": "^11.36",
+        "symfony/var-dumper": "^7.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "KangBabi\\": "src/",
+            "KangBabi\\Models\\": "src/Models/",
+            "KangBabi\\Database\\": "src/Database/",
+            "KangBabi\\Traits\\": "src/Traits/"
+        }
+    },
+    "authors": [
+        {
+            "name": "kang-babi",
+            "email": "joshuabuban.benosa@bicol-u.edu.ph"
+        }
+    ]
+}
