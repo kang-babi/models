@@ -16,7 +16,7 @@ class Builder
       $this->setModel($model);
     }
 
-    $this->connection = $model?->getConnection() ?: Connection::getConnection();
+    $this->connection = $model->getConnection() ?: new Connection;
   }
 
   public function setModel($model)
@@ -83,12 +83,18 @@ class Builder
 
   public function hydrate($records)
   {
-    return array_map(function ($record) {
+    $records = array_map(function ($record) {
       $model = $this->model->newInstance();
 
-      $model->fill($record);
+      $model->fill($record, true);
 
       return $model;
     }, $records);
+
+    if ($this->limit === 1) {
+      return $records[0] ?? null;
+    }
+
+    return $records;
   }
 }

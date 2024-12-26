@@ -2,10 +2,13 @@
 
 use KangBabi\Database\Builder;
 use KangBabi\Database\Connection;
+use KangBabi\Models\Model;
 use KangBabi\Models\User;
 
-define('BASE_PATH', __DIR__);
+require 'src/functions.php';
 
 require BASE_PATH . '/vendor/autoload.php';
 
-dd(User::all(), Connection::getConnectionName());
+$user = User::where('email');
+
+dd($user);

@@ -4,17 +4,16 @@ namespace KangBabi\Database;
 
 class Connection
 {
-  protected static $connection;
+  protected static $connections = [];
   protected static $connectionName;
 
   public function __construct()
   {
-    $config = require BASE_PATH . '/src/config.php';
-    $credentials = $config['database'];
+    $credentials = config('database');
 
     self::$connectionName = $credentials['driver'];
 
-    self::$connection = new \PDO(
+    self::$connections[self::$connectionName] = new \PDO(
       $credentials['driver'] . ':host=' . $credentials['host'] . ';dbname=' . $credentials['dbname'] . ';charset=' . $credentials['charset'],
       $credentials['username'],
       $credentials['password'],
@@ -25,26 +24,30 @@ class Connection
     );
   }
 
-  public static function getConnection()
+  public static function getConnection($connection = null)
   {
-    if (!self::$connection) {
+    if (!self::$connections[self::$connectionName]) {
       new self();
     }
 
-    return self::$connection;
+    if (array_key_exists($connection, self::$connections)) {
+      return self::$connections[self::$connectionName];
+    }
+
+    return self::$connections[self::$connectionName];
   }
 
   public static function getConnectionName()
   {
-    if (!self::$connection) {
+    if (!self::$connectionName) {
       new self();
     }
 
     return self::$connectionName;
   }
 
-  public function __toString()
+  public static function resolveConnection($connection = null)
   {
-    return 'Connected to database';
+    return self::$connections[$connection] ?: self::getConnection($connection);
   }
 }

@@ -2,6 +2,9 @@
 
 namespace KangBabi\Traits;
 
+use KangBabi\Database\Connection;
+use KangBabi\Exceptions\AttributeDoesNotExistException;
+
 trait PreparesStatement
 {
   protected $limit;
@@ -22,17 +25,21 @@ trait PreparesStatement
     $this->query .= ' WHERE ';
 
     foreach ($this->wheres as $key => $where) {
-      $this->query .= "{$where['column']} {$where['operator']} ?";
+      if ($this->model->isAttribute($where['column'])) {
+        $this->query .= "{$where['column']} {$where['operator']} ?";
 
-      if ($key < count($this->wheres) - 1) {
-        $this->query .= " {$where['boolean']} ";
+        if ($key < count($this->wheres) - 1) {
+          $this->query .= " {$where['boolean']} ";
+        }
+      } else {
+        throw new AttributeDoesNotExistException($this->model::class, $where['column']);
       }
     }
   }
 
   public function prepareBindings()
   {
-    foreach ($this->wheres as $key => $where) {
+    foreach ($this->wheres as $where) {
       $this->bindings[] = $where['value'];
     }
 
@@ -45,13 +52,14 @@ trait PreparesStatement
     }
 
     if ($this->orderBy) {
-      $this->query .= " ORDER BY {$this->orderBy['column']} {$this->orderBy['direction']}";
+      $this->query .= " ORDER BY ? ?";
+      $this->bindings += [$this->orderBy['column'], $this->orderBy['direction']];
     }
   }
 
   public function execute()
   {
-    $statement = $this->connection->prepare($this->query);
+    $statement = Connection::resolveConnection($this->connection)->prepare($this->query);
     $statement->execute($this->bindings);
 
     return $statement->fetchAll();
