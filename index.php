@@ -9,6 +9,6 @@ require 'src/functions.php';
 
 require BASE_PATH . '/vendor/autoload.php';
 
-$user = User::where('email');
+$user = User::all();
 
 dd($user);
